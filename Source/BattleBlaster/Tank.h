@@ -4,10 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "BasicPawn.h"
+
+#include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
+
 #include "Tank.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class BATTLEBLASTER_API ATank : public ABasicPawn
@@ -17,7 +21,7 @@ class BATTLEBLASTER_API ATank : public ABasicPawn
 public:
 	// Sets default values for this pawn's properties
 	ATank();
-	
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -28,4 +32,12 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UPROPERTY(VisibleAnywhere)
+	USpringArmComponent* SpringArmComp;
+
+	UPROPERTY(VisibleAnywhere)
+	UCameraComponent* CameraComp;
+
+
 };
