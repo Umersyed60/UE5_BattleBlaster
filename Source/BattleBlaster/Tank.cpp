@@ -3,6 +3,9 @@
 
 #include "Tank.h"
 
+#include "Camera/CameraComponent.h"
+#include "InputMappingContext.h"
+
 ATank::ATank() {
 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -19,6 +22,13 @@ void ATank::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (APlayerController* PlayerController = Cast<APlayerController>(Controller)) {
+		if (ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer()) {
+			if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer)) {
+				SubSystem->AddMappingContext(DefaultMappingContext, 0);
+			}
+		}
+	}
 }
 
 // Called every frame
@@ -33,4 +43,14 @@ void ATank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	if (UEnhancedInputComponent* EnhanceInputComp = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
+		EnhanceInputComp->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATank::MoveInput);
+	}
+}
+
+void ATank::MoveInput(const FInputActionValue& Value)
+{
+	if (float InputValue = Value.Get<float>()) {
+
+	}
 }
