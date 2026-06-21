@@ -37,6 +37,16 @@ void ATank::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//To Rotate Tank Turrent Along With Mouse Position
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	if (PlayerController) {
+		FHitResult HitResult;
+		PlayerController->GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
+
+		RotateTurrent(HitResult.ImpactPoint);
+		//DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 25.0f, 12, FColor::Red);
+	}
+
 }
 
 // Called to bind functionality to input
@@ -52,6 +62,7 @@ void ATank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void ATank::MoveInput(const FInputActionValue& Value)
 {
+	//To Move Tank In World
 	float InputValue = Value.Get<float>();
 
 	FVector DeltaLocation = FVector(0.0f, 0.0f, 0.0f);
@@ -62,6 +73,7 @@ void ATank::MoveInput(const FInputActionValue& Value)
 
 void ATank::TurnInput(const FInputActionValue& Value)
 {
+	//To Rotate Tank In World
 	float InputValue = Value.Get<float>();
 
 	FRotator DeltaRotation = FRotator(0.0f, 0.0f, 0.0f);
