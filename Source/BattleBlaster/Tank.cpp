@@ -5,6 +5,7 @@
 
 #include "Camera/CameraComponent.h"
 #include "InputMappingContext.h"
+#include "Kismet/GameplayStatics.h"
 
 ATank::ATank() {
 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -36,6 +37,16 @@ void ATank::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//To Rotate Tank Turrent Along With Mouse Position
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	if (PlayerController) {
+		FHitResult HitResult;
+		PlayerController->GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
+
+		RotateTurrent(HitResult.ImpactPoint);
+		//DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 25.0f, 12, FColor::Red);
+	}
+
 }
 
 // Called to bind functionality to input
@@ -45,12 +56,27 @@ void ATank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 	if (UEnhancedInputComponent* EnhanceInputComp = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
 		EnhanceInputComp->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATank::MoveInput);
+		EnhanceInputComp->BindAction(TurnAction, ETriggerEvent::Triggered, this, &ATank::TurnInput);
 	}
 }
 
 void ATank::MoveInput(const FInputActionValue& Value)
 {
-	if (float InputValue = Value.Get<float>()) {
+	//To Move Tank In World
+	float InputValue = Value.Get<float>();
 
-	}
+	FVector DeltaLocation = FVector(0.0f, 0.0f, 0.0f);
+	float DeltaTime = UGameplayStatics::GetWorldDeltaSeconds(GetWorld());
+	DeltaLocation.X = Speed * InputValue * DeltaTime;
+	AddActorLocalOffset(DeltaLocation, true);
+}
+
+void ATank::TurnInput(const FInputActionValue& Value)
+{
+	//To Rotate Tank In World
+	float InputValue = Value.Get<float>();
+
+	FRotator DeltaRotation = FRotator(0.0f, 0.0f, 0.0f);
+	DeltaRotation.Yaw = TurnRate * InputValue * GetWorld()->GetDeltaSeconds();
+	AddActorLocalRotation(DeltaRotation, true);
 }
