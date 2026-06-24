@@ -11,8 +11,17 @@ AEnemyTurret::AEnemyTurret()
 
 void AEnemyTurret::BeginPlay()
 {
+	Super::BeginPlay();
 }
 
 void AEnemyTurret::Tick(float DeltaTime)
 {
+	Super::Tick(DeltaTime);
+
+	if (Tank) {
+		float DistanceToTank = FVector::Dist(GetActorLocation(), Tank->GetActorLocation());
+		if (DistanceToTank < FireRange) {
+			RotateTurrent(Tank->GetActorLocation());
+		}
+	}
 }
