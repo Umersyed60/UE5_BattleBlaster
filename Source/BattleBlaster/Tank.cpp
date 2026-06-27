@@ -57,6 +57,7 @@ void ATank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	if (UEnhancedInputComponent* EnhanceInputComp = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
 		EnhanceInputComp->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATank::MoveInput);
 		EnhanceInputComp->BindAction(TurnAction, ETriggerEvent::Triggered, this, &ATank::TurnInput);
+		EnhanceInputComp->BindAction(FireAction, ETriggerEvent::Started, this, &ATank::Fire);
 	}
 }
 

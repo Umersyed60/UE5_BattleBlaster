@@ -48,6 +48,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputAction* TurnAction;
 
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputAction* FireAction;
+
 	UPROPERTY(EditAnywhere)
 	float Speed = 300.0f;
 

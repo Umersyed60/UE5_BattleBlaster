@@ -6,6 +6,9 @@
 #include "GameFramework/Pawn.h"
 
 #include "Components/CapsuleComponent.h"
+#include "EnhancedInputSubsystems.h"
+
+#include "Projectile.h"
 
 #include "BasicPawn.generated.h"
 
@@ -27,5 +30,13 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* TurretMesh;
 
+	UPROPERTY(VisibleAnywhere)
+	USceneComponent* ProjectileSpawnPoint;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AProjectile> ProjectileClass;
+
 	void RotateTurrent(FVector LookAtTarget);
+
+	void Fire();
 };

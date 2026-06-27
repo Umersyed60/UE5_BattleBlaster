@@ -2,6 +2,7 @@
 
 
 #include "BasicPawn.h"
+#include "InputMappingContext.h"
 
 // Sets default values
 ABasicPawn::ABasicPawn()
@@ -14,6 +15,9 @@ ABasicPawn::ABasicPawn()
 
 	TurretMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TurretMesh"));
 	TurretMesh->SetupAttachment(BaseMesh);
+
+	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("ProjectileSpawnPoint"));
+	ProjectileSpawnPoint->SetupAttachment(TurretMesh);
 }
 
 void ABasicPawn::RotateTurrent(FVector LookAtTarget)
@@ -24,5 +28,14 @@ void ABasicPawn::RotateTurrent(FVector LookAtTarget)
 	FRotator InterpolatedRotation = FMath::RInterpTo(TurretMesh->GetComponentRotation(), LookAtRotation, GetWorld()->GetDeltaSeconds(), 20.0f);
 
 	TurretMesh->SetWorldRotation(InterpolatedRotation);
+}
+
+void ABasicPawn::Fire()
+{
+	FVector SpawnLocation = ProjectileSpawnPoint->GetComponentLocation();
+	FRotator SpawnRotation = ProjectileSpawnPoint->GetComponentRotation();
+
+	GetWorld()->SpawnActor<AProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);
+	//DrawDebugSphere(GetWorld(), SpawnLocation, 25.0f, 12, FColor::Red, false, 3.0f);
 }
 
