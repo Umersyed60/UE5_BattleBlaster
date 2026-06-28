@@ -12,7 +12,7 @@ void ABattleBlasterGameMode::BeginPlay()
 	TArray<AActor*> EnmyTurret;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemyTurret::StaticClass(), EnmyTurret);
 	EnemyTurretCount = EnmyTurret.Num();
-	UE_LOG(LogTemp, Display, TEXT("Enemy Turret Count is: %d"), EnemyTurretCount);
+	//UE_LOG(LogTemp, Display, TEXT("Enemy Turret Count is: %d"), EnemyTurretCount);
 
 	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 	if (PlayerPawn) {

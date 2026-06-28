@@ -12,16 +12,33 @@ AEnemyTurret::AEnemyTurret()
 void AEnemyTurret::BeginPlay()
 {
 	Super::BeginPlay();
+
+	FTimerHandle FireTimerHandle;
+	GetWorldTimerManager().SetTimer(FireTimerHandle, this, &AEnemyTurret::CheckFireCondition, FireRate, true);
 }
 
 void AEnemyTurret::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (IsInFireRange()) {
+		RotateTurrent(Tank->GetActorLocation());
+	}
+}
+
+void AEnemyTurret::CheckFireCondition() {
+	if (Tank && IsInFireRange()) {
+		Fire();
+	}
+}
+
+bool AEnemyTurret::IsInFireRange()
+{
+	bool Result = false;
+
 	if (Tank) {
 		float DistanceToTank = FVector::Dist(GetActorLocation(), Tank->GetActorLocation());
-		if (DistanceToTank < FireRange) {
-			RotateTurrent(Tank->GetActorLocation());
-		}
+		Result = DistanceToTank <= FireRange;
 	}
+	return Result;
 }
