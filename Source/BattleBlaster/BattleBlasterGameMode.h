@@ -24,4 +24,6 @@ protected:
 public:
 	ATank* Tank;
 	int32 EnemyTurretCount;
+
+	void ActorDied(AActor* DeadActor);
 };
