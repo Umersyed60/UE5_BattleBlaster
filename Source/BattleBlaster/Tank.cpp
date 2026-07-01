@@ -23,7 +23,8 @@ void ATank::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller)) {
+	PlayerController = Cast<APlayerController>(Controller);
+	if (PlayerController) {
 		if (ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer()) {
 			if (UEnhancedInputLocalPlayerSubsystem* SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer)) {
 				SubSystem->AddMappingContext(DefaultMappingContext, 0);
@@ -38,7 +39,6 @@ void ATank::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	//To Rotate Tank Turrent Along With Mouse Position
-	APlayerController* PlayerController = Cast<APlayerController>(GetController());
 	if (PlayerController) {
 		FHitResult HitResult;
 		PlayerController->GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
@@ -80,4 +80,25 @@ void ATank::TurnInput(const FInputActionValue& Value)
 	FRotator DeltaRotation = FRotator(0.0f, 0.0f, 0.0f);
 	DeltaRotation.Yaw = TurnRate * InputValue * GetWorld()->GetDeltaSeconds();
 	AddActorLocalRotation(DeltaRotation, true);
+}
+
+void ATank::HandleDestruction() {
+	Super::HandleDestruction();
+
+	IsAlive = false;
+	SetActorHiddenInGame(true);
+	SetActorTickEnabled(false);
+	SetPlayerEnabled(false);
+}
+
+void ATank::SetPlayerEnabled(bool Enabled)
+{
+	if (PlayerController) {
+		if (Enabled) {
+			EnableInput(PlayerController);
+		}
+		else {
+			DisableInput(PlayerController);
+		}
+	}
 }
