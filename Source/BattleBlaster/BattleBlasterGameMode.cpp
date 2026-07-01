@@ -33,3 +33,22 @@ void ABattleBlasterGameMode::BeginPlay()
 			LoopIndex++;
 		}
 }
+
+void ABattleBlasterGameMode::ActorDied(AActor* DeadActor)
+{
+	if (DeadActor == Tank) {
+		Tank->HandleDestruction();
+	}
+	else
+	{
+		AEnemyTurret* DeadEnemyTurret = Cast<AEnemyTurret>(DeadActor);
+		if (DeadEnemyTurret) {
+			DeadEnemyTurret->HandleDestruction();
+
+			EnemyTurretCount -= 1;
+			if (EnemyTurretCount <= 0) {
+				UE_LOG(LogTemp, Display, TEXT("Victoryyyy!!!!!"));
+			}
+		}
+	}
+}

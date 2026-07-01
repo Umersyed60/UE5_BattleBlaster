@@ -27,8 +27,10 @@ void AEnemyTurret::Tick(float DeltaTime)
 }
 
 void AEnemyTurret::CheckFireCondition() {
-	if (Tank && IsInFireRange()) {
-		Fire();
+	if (Tank && Tank->IsAlive) {
+		if (IsInFireRange()) {
+			Fire();
+		}
 	}
 }
 
@@ -41,4 +43,10 @@ bool AEnemyTurret::IsInFireRange()
 		Result = DistanceToTank <= FireRange;
 	}
 	return Result;
+}
+
+void AEnemyTurret::HandleDestruction() {
+	Super::HandleDestruction();
+
+	Destroy();
 }
