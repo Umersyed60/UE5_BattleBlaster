@@ -11,9 +11,11 @@ ATank::ATank() {
 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	//Setting Spring Arm Component For Player Follow Camera
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	SpringArmComp->SetupAttachment(CapsuleComp);
 
+	//Setting Player Follow Camera
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	CameraComp->SetupAttachment(SpringArmComp);
 }
@@ -23,6 +25,7 @@ void ATank::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//Setting Enhanced Input's Default Mapping Context
 	PlayerController = Cast<APlayerController>(Controller);
 	if (PlayerController) {
 		if (ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer()) {
@@ -31,6 +34,8 @@ void ATank::BeginPlay()
 			}
 		}
 	}
+
+	//Making Player Disabled Before Timer Ends
 	SetPlayerEnabled(false);
 }
 
@@ -44,13 +49,14 @@ void ATank::Tick(float DeltaTime)
 		FHitResult HitResult;
 		PlayerController->GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
 
+		//Passing Mouse Cursor Values To Rotate Tank Turret in BasicPawn Class
 		RotateTurrent(HitResult.ImpactPoint);
 		//DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 25.0f, 12, FColor::Red);
 	}
 
 }
 
-// Called to bind functionality to input
+// Called to bind Player Movement Action to Relative Functions
 void ATank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -62,9 +68,9 @@ void ATank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	}
 }
 
+//Function To Move Tank In World On User Input
 void ATank::MoveInput(const FInputActionValue& Value)
 {
-	//To Move Tank In World
 	float InputValue = Value.Get<float>();
 
 	FVector DeltaLocation = FVector(0.0f, 0.0f, 0.0f);
@@ -73,9 +79,9 @@ void ATank::MoveInput(const FInputActionValue& Value)
 	AddActorLocalOffset(DeltaLocation, true);
 }
 
+//Function To Rotate Tank In World On User Input
 void ATank::TurnInput(const FInputActionValue& Value)
 {
-	//To Rotate Tank In World
 	float InputValue = Value.Get<float>();
 
 	FRotator DeltaRotation = FRotator(0.0f, 0.0f, 0.0f);
@@ -83,6 +89,7 @@ void ATank::TurnInput(const FInputActionValue& Value)
 	AddActorLocalRotation(DeltaRotation, true);
 }
 
+//Function To Handle Player Tank Destruction
 void ATank::HandleDestruction() {
 	Super::HandleDestruction();
 
@@ -92,6 +99,7 @@ void ATank::HandleDestruction() {
 	SetPlayerEnabled(false);
 }
 
+//Function Call To Enable/Disable Player Input
 void ATank::SetPlayerEnabled(bool Enabled)
 {
 	if (PlayerController) {
