@@ -33,6 +33,22 @@ void ABattleBlasterGameMode::BeginPlay()
 			}
 			LoopIndex++;
 		}
+
+		CountdownSeconds = CountdownDelay;
+		GetWorldTimerManager().SetTimer(CountdownTimerHandle, this, &ABattleBlasterGameMode::OnCountdownTimerTimeout, 1.0f, true);
+}
+
+void ABattleBlasterGameMode::OnCountdownTimerTimeout()
+{
+	if (CountdownSeconds > 0) {
+		UE_LOG(LogTemp, Display, TEXT("Level Starts In: %d"), CountdownSeconds);
+		CountdownSeconds--;
+	}
+	else {
+		GetWorldTimerManager().ClearTimer(CountdownTimerHandle);
+		UE_LOG(LogTemp, Display, TEXT("GO!!!"));
+		Tank->SetPlayerEnabled(true);
+	}
 }
 
 void ABattleBlasterGameMode::ActorDied(AActor* DeadActor)
