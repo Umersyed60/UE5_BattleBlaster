@@ -7,6 +7,7 @@
 // Sets default values
 ABasicPawn::ABasicPawn()
 {
+	//Setting Hirarchy Of Meshes For Player Tank And Enemy Turret Objects
 	CapsuleComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComp"));
 	SetRootComponent(CapsuleComp);
 
@@ -20,22 +21,27 @@ ABasicPawn::ABasicPawn()
 	ProjectileSpawnPoint->SetupAttachment(TurretMesh);
 }
 
+//Function To Rotate Player Tank and Enemy Cannon Turret
 void ABasicPawn::RotateTurrent(FVector LookAtTarget)
 {
 	FVector VectorToTarget = LookAtTarget - TurretMesh->GetComponentLocation();
 	FRotator LookAtRotation = FRotator(0.0f, VectorToTarget.Rotation().Yaw, 0.0f);
 
+	//InterPolated Rotation for Smooth Rotation of Turret
 	FRotator InterpolatedRotation = FMath::RInterpTo(TurretMesh->GetComponentRotation(), LookAtRotation, GetWorld()->GetDeltaSeconds(), 20.0f);
 
+	//Setting Turret Rotation
 	TurretMesh->SetWorldRotation(InterpolatedRotation);
 }
 
+//Function To Fire Projectile
 void ABasicPawn::Fire()
 {
 	FVector SpawnLocation = ProjectileSpawnPoint->GetComponentLocation();
 	FRotator SpawnRotation = ProjectileSpawnPoint->GetComponentRotation();
 	//DrawDebugSphere(GetWorld(), SpawnLocation, 25.0f, 12, FColor::Red, false, 3.0f);
 
+	//Spawning Projectile And Setting Position And Rotation
 	AProjectile* Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);
 	if (Projectile) {
 		Projectile->SetOwner(this);

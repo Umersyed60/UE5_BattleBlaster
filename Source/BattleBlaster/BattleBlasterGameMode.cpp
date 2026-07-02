@@ -10,11 +10,12 @@ void ABattleBlasterGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//Setting Enemy Turret Count in Level
 	TArray<AActor*> EnmyTurret;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemyTurret::StaticClass(), EnmyTurret);
 	EnemyTurretCount = EnmyTurret.Num();
-	//UE_LOG(LogTemp, Display, TEXT("Enemy Turret Count is: %d"), EnemyTurretCount);
 
+	//Setting Player Reference
 	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 	if (PlayerPawn) {
 		Tank = Cast<ATank>(PlayerPawn);
@@ -23,48 +24,68 @@ void ABattleBlasterGameMode::BeginPlay()
 		}
 	}
 
+	//Setting Player Tank Reference in Enemy Turret Class
 	int32 LoopIndex = 0;
-		while (LoopIndex < EnemyTurretCount) {
-			AActor* EnemyTurretActor = EnmyTurret[LoopIndex];
+	while (LoopIndex < EnemyTurretCount) {
+		AActor* EnemyTurretActor = EnmyTurret[LoopIndex];
 
-			AEnemyTurret* EnmyTurtRef = Cast<AEnemyTurret>(EnemyTurretActor);
-			if (EnmyTurtRef && Tank) {
-				EnmyTurtRef->Tank = Tank;
-			}
-			LoopIndex++;
+		AEnemyTurret* EnmyTurtRef = Cast<AEnemyTurret>(EnemyTurretActor);
+		if (EnmyTurtRef && Tank) {
+			EnmyTurtRef->Tank = Tank;
 		}
+		LoopIndex++;
+	}
 
-		CountdownSeconds = CountdownDelay;
-		GetWorldTimerManager().SetTimer(CountdownTimerHandle, this, &ABattleBlasterGameMode::OnCountdownTimerTimeout, 1.0f, true);
+	//Creating UI Widget To Display Messages On Screen
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (PlayerController) {
+		ScreenMessageWidget = CreateWidget<UScreenMessage>(PlayerController, ScreenMessageClass);
+		if (ScreenMessageWidget) {
+			ScreenMessageWidget->AddToPlayerScreen();
+		}
+	}
+
+	//Setting Level Start Countdown Timer
+	CountdownSeconds = CountdownDelay;
+	GetWorldTimerManager().SetTimer(CountdownTimerHandle, this, &ABattleBlasterGameMode::OnCountdownTimerTimeout, 1.0f, true);
 }
 
 void ABattleBlasterGameMode::OnCountdownTimerTimeout()
 {
+	//Case Where CountDown Timer Is Greater Than Zero
 	if (CountdownSeconds > 0) {
-		UE_LOG(LogTemp, Display, TEXT("Level Starts In: %d"), CountdownSeconds);
-		CountdownSeconds--;
+		FString Message = FString::Printf(TEXT("Level Starts In: %d"), CountdownSeconds);
+		ScreenMessageWidget->SetMessageText(Message);
 	}
-	else {
-		GetWorldTimerManager().ClearTimer(CountdownTimerHandle);
-		UE_LOG(LogTemp, Display, TEXT("GO!!!"));
+	//Case Where CountDown Timer Is Equal To Zero
+	else if (CountdownSeconds == 0) {
+		ScreenMessageWidget->SetMessageText("GO!!!");
 		Tank->SetPlayerEnabled(true);
 	}
+	//Case Where CountDown Timer Is Less Than Zero
+	else {
+		GetWorldTimerManager().ClearTimer(CountdownTimerHandle);
+		ScreenMessageWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
+
+	CountdownSeconds--;
 }
 
 void ABattleBlasterGameMode::ActorDied(AActor* DeadActor)
 {
-
 	bool IsGameOver = false;
 
+	//Player Dead Case
 	if (DeadActor == Tank) {
-		Tank->HandleDestruction();
+		Tank->HandleDestruction();//Player Dead Function Call
 		IsGameOver = true;
 	}
+	//Enemy Turrets Dead Case
 	else
 	{
 		AEnemyTurret* DeadEnemyTurret = Cast<AEnemyTurret>(DeadActor);
 		if (DeadEnemyTurret) {
-			DeadEnemyTurret->HandleDestruction();
+			DeadEnemyTurret->HandleDestruction();//Enemy Turret Dead Function Call
 
 			EnemyTurretCount -= 1;
 			if (EnemyTurretCount <= 0) {
@@ -74,10 +95,13 @@ void ABattleBlasterGameMode::ActorDied(AActor* DeadActor)
 		}
 	}
 
+	//Handling GameOver State Based On IsGameOver and IsVictory variables
 	if (IsGameOver) {
 		FString GameOverString = IsVictory ? "Victory" : "Defeat!";
-		UE_LOG(LogTemp, Display, TEXT("Game State: %s"), *GameOverString);
+		ScreenMessageWidget->SetVisibility(ESlateVisibility::Visible);
+		ScreenMessageWidget->SetMessageText(GameOverString);
 
+		//Setting Timer To Call LoadNextLevel or RestartCurrentLevel With Some Delay
 		FTimerHandle GameOverTimerHandle;
 		GetWorldTimerManager().SetTimer(GameOverTimerHandle, this, &ABattleBlasterGameMode::OnGameOverTimerTimeout, GameOverDelay, false);
 	}
@@ -85,6 +109,7 @@ void ABattleBlasterGameMode::ActorDied(AActor* DeadActor)
 
 void ABattleBlasterGameMode::OnGameOverTimerTimeout()
 {
+	//Getting GameInstance Class Reference To Call LoadNextLevel or RestartCurrentLevel Functions
 	UGameInstance* GameInstance = GetGameInstance();
 	if (GameInstance) {
 		UBattleBlasterGameInstance* BattleBlasterGameInstance = Cast<UBattleBlasterGameInstance>(GameInstance);

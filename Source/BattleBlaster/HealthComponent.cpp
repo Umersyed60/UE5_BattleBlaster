@@ -20,11 +20,12 @@ void UHealthComponent::BeginPlay()
 { 
 	Super::BeginPlay();
 
-	// ...
 	Health = MaxHealth;
 
+	//Using Delegate To Bind OnDamageTaken Function with Relevant Pawn Object
 	GetOwner()->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::OnDamageTaken);
 
+	//Getting GameMode Reference For Later Use
 	AGameModeBase* GameMode = UGameplayStatics::GetGameMode(GetWorld());
 	if (GameMode) {
 		BattleBlasterGameMode = Cast<ABattleBlasterGameMode>(GameMode);
@@ -36,17 +37,17 @@ void UHealthComponent::BeginPlay()
 void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
 }
 
+//Delegate Function To Be Called After ApplyDamage Function From Projectile Class
 void UHealthComponent::OnDamageTaken(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
 {
 	if (Damage > 0.0f) {
-		Health -= Damage;
+		Health -= Damage; //Reducing Health
+
 		if (Health <= 0.0f) {
-			/*GetOwner()->Destroy();*/
 			if (BattleBlasterGameMode) {
+				//Call ActorDied Function in GameMode Class On Health Reduces To Zero
 				BattleBlasterGameMode->ActorDied(DamagedActor);
 			}
 		}
