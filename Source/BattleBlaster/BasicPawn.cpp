@@ -52,5 +52,8 @@ void ABasicPawn::HandleDestruction() {
 	if (DeathParticles) {
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DeathParticles, GetActorLocation(), GetActorRotation());
 	}
+	if (ExplodeSound) {
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), ExplodeSound, GetActorLocation());
+	}
 }
 
