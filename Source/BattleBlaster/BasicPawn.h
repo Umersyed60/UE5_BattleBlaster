@@ -9,6 +9,7 @@
 #include "EnhancedInputSubsystems.h"
 
 #include "Projectile.h"
+#include "NiagaraFunctionLibrary.h"
 
 #include "BasicPawn.generated.h"
 
@@ -32,6 +33,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* ProjectileSpawnPoint;
+
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* DeathParticles;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AProjectile> ProjectileClass;
