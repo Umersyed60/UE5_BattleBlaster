@@ -49,6 +49,8 @@ void ABasicPawn::Fire()
 }
 
 void ABasicPawn::HandleDestruction() {
-
+	if (DeathParticles) {
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DeathParticles, GetActorLocation(), GetActorRotation());
+	}
 }
 

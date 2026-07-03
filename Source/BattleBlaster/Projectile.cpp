@@ -18,8 +18,8 @@ AProjectile::AProjectile()
 	ProjectileMovementComp->InitialSpeed = 1000.0f;
 	ProjectileMovementComp->MaxSpeed = 1000.0f;
 
-	//Binding OnHit Function To ProjectileMesh So It Gets Called On Hitting Other Objects
-	ProjectileMesh->OnComponentHit.AddDynamic(this, &AProjectile::OnHit);
+	TrailParticle = CreateDefaultSubobject<UNiagaraComponent>(TEXT("TrailParticle"));
+	TrailParticle->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
@@ -27,6 +27,8 @@ void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//Binding OnHit Function To ProjectileMesh So It Gets Called On Hitting Other Objects
+	ProjectileMesh->OnComponentHit.AddDynamic(this, &AProjectile::OnHit);
 }
 
 // Called every frame
@@ -44,6 +46,10 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, U
 		if (OtherActor && OtherActor != MyOwner && OtherActor != this) {
 			//Calling ApplyDamage Function To Trigger OnDamageTaken Function In HealthComponent
 			UGameplayStatics::ApplyDamage(OtherActor, Damage, MyOwner->GetInstigatorController(), this, UDamageType::StaticClass());
+			
+			if (HitParticles) {
+				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitParticles, GetActorLocation(), GetActorRotation());
+			}
 		}
 	}
 	Destroy();
