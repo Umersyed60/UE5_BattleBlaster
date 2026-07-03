@@ -7,6 +7,7 @@
 
 #include "Components/CapsuleComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "Projectile.h"
 #include "NiagaraFunctionLibrary.h"
@@ -36,6 +37,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	UNiagaraSystem* DeathParticles;
+
+	UPROPERTY(EditAnywhere)
+	USoundBase* ExplodeSound;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AProjectile> ProjectileClass;
